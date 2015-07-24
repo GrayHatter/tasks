@@ -1,15 +1,19 @@
 package com.todoroo.astrid.gcal;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 
 import com.todoroo.andlib.utility.DateUtilities;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tasks.R;
 import org.tasks.preferences.Preferences;
 
@@ -18,6 +22,8 @@ import javax.inject.Singleton;
 
 @Singleton
 public class CalendarAlarmScheduler {
+
+    private static final Logger log = LoggerFactory.getLogger(CalendarStartupReceiver.class);
 
     public static final String URI_PREFIX = "cal-reminder";
     public static final String URI_PREFIX_POSTPONE = "cal-postpone";
@@ -33,6 +39,12 @@ public class CalendarAlarmScheduler {
         if (!preferences.getBoolean(R.string.p_calendar_reminders, true) && !force) {
             return;
         }
+
+        if (!preferences.hasCalendarPermission()) {
+            log.warn("{} has been revoked", Manifest.permission.READ_CALENDAR);
+            return;
+        }
+
         new Thread(new Runnable() {
             @Override
             public void run() {

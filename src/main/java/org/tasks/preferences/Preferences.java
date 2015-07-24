@@ -1,7 +1,9 @@
 package org.tasks.preferences;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -389,5 +391,9 @@ public class Preferences {
             return new File(path);
         }
         return null;
+    }
+
+    public boolean hasCalendarPermission() {
+        return context.checkSelfPermission(Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED;
     }
 }

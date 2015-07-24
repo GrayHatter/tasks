@@ -359,22 +359,22 @@ ViewPager.OnPageChangeListener, EditNoteActivity.UpdatesChangedListener {
         RepeatControlSet repeatControls = new RepeatControlSet(preferences, getActivity(), dialogBuilder);
         controlSetMap.put(getString(R.string.TEA_ctrl_repeat_pref), repeatControls);
 
-        GCalControlSet gcalControl = new GCalControlSet(gcalHelper, getActivity());
-        controlSetMap.put(getString(R.string.TEA_ctrl_gcal), gcalControl);
-
-        // The deadline control set contains the repeat controls and the
-        // calendar controls.
-        // NOTE: we add the gcalControl AFTER the
-        // deadline control, because
-        // otherwise the correct date may not be written to the calendar event.
-        // Order matters!
         DeadlineControlSet deadlineControl = new DeadlineControlSet(getActivity(), preferences);
         controlSetMap.put(getString(R.string.TEA_ctrl_when_pref), deadlineControl);
         controls.add(repeatControls);
 
         repeatControls.addListener(editTitle);
         controls.add(deadlineControl);
-        controls.add(gcalControl);
+
+        // NOTE: we add the gcalControl AFTER the
+        // deadline control, because
+        // otherwise the correct date may not be written to the calendar event.
+        // Order matters!
+        if (preferences.hasCalendarPermission()) {
+            GCalControlSet gcalControl = new GCalControlSet(gcalHelper, getActivity());
+            controlSetMap.put(getString(R.string.TEA_ctrl_gcal), gcalControl);
+            controls.add(gcalControl);
+        }
 
         ImportanceControlSet importanceControl = new ImportanceControlSet(getActivity());
         controls.add(importanceControl);
