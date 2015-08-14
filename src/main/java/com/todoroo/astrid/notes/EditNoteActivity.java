@@ -18,7 +18,6 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.text.util.Linkify;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +44,6 @@ import com.todoroo.astrid.data.Metadata;
 import com.todoroo.astrid.data.RemoteModel;
 import com.todoroo.astrid.data.Task;
 import com.todoroo.astrid.data.UserActivity;
-import com.todoroo.astrid.service.StartupService;
 import com.todoroo.astrid.service.TaskService;
 import com.todoroo.astrid.timers.TimerActionControlSet.TimerActionListener;
 
@@ -61,7 +59,6 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.tasks.date.DateTimeUtils.newDate;
 import static org.tasks.date.DateTimeUtils.newDateTime;
 import static org.tasks.files.FileHelper.getPathFromUri;
 import static org.tasks.files.ImageHelper.sampleBitmap;

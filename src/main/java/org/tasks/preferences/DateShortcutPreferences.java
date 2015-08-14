@@ -11,6 +11,8 @@ import org.tasks.activities.TimePickerActivity;
 import org.tasks.injection.InjectingPreferenceActivity;
 import org.tasks.ui.TimePreference;
 
+import static org.tasks.date.DateTimeUtils.newDateTime;
+
 public class DateShortcutPreferences extends InjectingPreferenceActivity implements Preference.OnPreferenceChangeListener {
 
     private static final int REQUEST_MORNING = 10001;
@@ -55,7 +57,7 @@ public class DateShortcutPreferences extends InjectingPreferenceActivity impleme
         preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference ignored) {
-                final DateTime current = new DateTime().withMillisOfDay(preference.getMillisOfDay());
+                final DateTime current = newDateTime().withMillisOfDay(preference.getMillisOfDay());
                 startActivityForResult(new Intent(DateShortcutPreferences.this, TimePickerActivity.class) {{
                     putExtra(TimePickerActivity.EXTRA_TIMESTAMP, current.getMillis());
                 }}, requestCode);

@@ -37,7 +37,6 @@ import org.tasks.location.GeofenceService;
 import org.tasks.preferences.Preferences;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -361,10 +360,9 @@ public class ReminderControlSet extends TaskEditControlSetBase implements Adapte
 
     private String getDisplayString(long forDate) {
         DateTime dateTime = newDateTime(forDate);
-        Date d = dateTime.toDate();
         return (dateTime.getYear() == newDateTime().getYear()
-                ? DateUtilities.getLongDateStringHideYear(d)
-                : DateUtilities.getLongDateString(d)) +
+                ? DateUtilities.getLongDateStringHideYear(dateTime)
+                : DateUtilities.getLongDateString(dateTime)) +
                 ", " + DateUtilities.getTimeString(activity, dateTime);
     }
 

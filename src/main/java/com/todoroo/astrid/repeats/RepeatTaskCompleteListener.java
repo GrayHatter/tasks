@@ -25,6 +25,8 @@ import com.todoroo.astrid.service.TaskService;
 import com.todoroo.astrid.utility.Flags;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tasks.injection.InjectingBroadcastReceiver;
@@ -33,15 +35,12 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
 import javax.inject.Inject;
 
-import static org.tasks.date.DateTimeUtils.newDate;
 import static org.tasks.date.DateTimeUtils.newDateTime;
-import static org.tasks.date.DateTimeUtils.newDateUtc;
 
 public class RepeatTaskCompleteListener extends InjectingBroadcastReceiver {
 
@@ -124,7 +123,7 @@ public class RepeatTaskCompleteListener extends InjectingBroadcastReceiver {
         RRule rrule = initRRule(recurrence);
 
         // initialize startDateAsDV
-        Date original = setUpStartDate(task, repeatAfterCompletion, rrule.getFreq());
+        DateTime original = setUpStartDate(task, repeatAfterCompletion, rrule.getFreq());
         DateValue startDateAsDV = setUpStartDateAsDV(task, original);
 
         if(rrule.getFreq() == Frequency.HOURLY || rrule.getFreq() == Frequency.MINUTELY) {
@@ -138,10 +137,10 @@ public class RepeatTaskCompleteListener extends InjectingBroadcastReceiver {
         }
     }
 
-    private static long handleWeeklyRepeatAfterComplete(RRule rrule, Date original,
+    private static long handleWeeklyRepeatAfterComplete(RRule rrule, DateTime original,
             boolean hasDueTime) {
         List<WeekdayNum> byDay = rrule.getByDay();
-        long newDate = original.getTime();
+        long newDate = original.getMillis();
         newDate += DateUtilities.ONE_WEEK * (rrule.getInterval() - 1);
         Calendar date = Calendar.getInstance();
         date.setTimeInMillis(newDate);
@@ -161,10 +160,10 @@ public class RepeatTaskCompleteListener extends InjectingBroadcastReceiver {
         }
     }
 
-    private static long handleMonthlyRepeat(Date original, DateValue startDateAsDV, boolean hasDueTime, RRule rrule) {
+    private static long handleMonthlyRepeat(DateTime original, DateValue startDateAsDV, boolean hasDueTime, RRule rrule) {
         if (DateUtilities.isEndOfMonth(original)) {
             Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(original.getTime());
+            cal.setTimeInMillis(original.getMillis());
 
             int interval = rrule.getInterval();
 
@@ -199,7 +198,7 @@ public class RepeatTaskCompleteListener extends InjectingBroadcastReceiver {
         return next;
     }
 
-    private static long invokeRecurrence(RRule rrule, Date original, DateValue startDateAsDV) {
+    private static long invokeRecurrence(RRule rrule, DateTime original, DateValue startDateAsDV) {
         long newDueDate = -1;
         RecurrenceIterator iterator = RecurrenceIteratorFactory.createRecurrenceIterator(rrule,
                 startDateAsDV, TimeZone.getDefault());
@@ -218,7 +217,7 @@ public class RepeatTaskCompleteListener extends InjectingBroadcastReceiver {
             newDueDate = buildNewDueDate(original, nextDate);
 
             // detect if we finished
-            if(newDueDate > original.getTime()) {
+            if(newDueDate > original.getMillis()) {
                 break;
             }
         }
@@ -226,21 +225,21 @@ public class RepeatTaskCompleteListener extends InjectingBroadcastReceiver {
     }
 
     /** Compute long due date from DateValue */
-    private static long buildNewDueDate(Date original, DateValue nextDate) {
+    private static long buildNewDueDate(DateTime original, DateValue nextDate) {
         long newDueDate;
         if(nextDate instanceof DateTimeValueImpl) {
             DateTimeValueImpl newDateTime = (DateTimeValueImpl)nextDate;
-            Date date = newDateUtc(newDateTime.year(), newDateTime.month(),
+            DateTime date = newDateTime(newDateUtc(newDateTime.year(), newDateTime.month(),
                     newDateTime.day(), newDateTime.hour(),
-                    newDateTime.minute(), newDateTime.second());
-            // time may be inaccurate due to DST, force time to be same
-            date.setHours(original.getHours());
-            date.setMinutes(original.getMinutes());
+                    newDateTime.minute(), newDateTime.second()))
+                    // time may be inaccurate due to DST, force time to be same
+                    .withHourOfDay(original.getHourOfDay())
+                    .withMinuteOfHour(original.getMinuteOfHour());
             newDueDate = Task.createDueDate(Task.URGENCY_SPECIFIC_DAY_TIME,
-                    date.getTime());
+                    date.getMillis());
         } else {
             newDueDate = Task.createDueDate(Task.URGENCY_SPECIFIC_DAY,
-                    newDate(nextDate.year(), nextDate.month(), nextDate.day()).getTime());
+                    newDateTime(nextDate.year(), nextDate.month(), nextDate.day(), 0, 0).getMillis());
         }
         return newDueDate;
     }
@@ -259,37 +258,38 @@ public class RepeatTaskCompleteListener extends InjectingBroadcastReceiver {
     }
 
     /** Set up repeat start date */
-    private static Date setUpStartDate(Task task, boolean repeatAfterCompletion, Frequency frequency) {
-        Date startDate = newDate();
-        if(task.hasDueDate()) {
-            Date dueDate = newDate(task.getDueDate());
-            if(repeatAfterCompletion) {
-                startDate = newDate(task.getCompletionDate());
+    private static DateTime setUpStartDate(Task task, boolean repeatAfterCompletion, Frequency frequency) {
+        DateTime startDate = newDateTime();
+        if (task.hasDueDate()) {
+            DateTime dueDate = newDateTime(task.getDueDate());
+            if (repeatAfterCompletion) {
+                startDate = newDateTime(task.getCompletionDate());
             } else {
                 startDate = dueDate;
             }
 
             if(task.hasDueTime() && frequency != Frequency.HOURLY && frequency != Frequency.MINUTELY) {
-                startDate.setHours(dueDate.getHours());
-                startDate.setMinutes(dueDate.getMinutes());
-                startDate.setSeconds(dueDate.getSeconds());
+                startDate = startDate
+                        .withHourOfDay(dueDate.getHourOfDay())
+                        .withMinuteOfHour(dueDate.getMinuteOfHour())
+                        .withSecondOfMinute(dueDate.getSecondOfMinute())
+                        .withMillisOfSecond(dueDate.getMillisOfSecond());
             }
         }
         return startDate;
     }
 
-    private static DateValue setUpStartDateAsDV(Task task, Date startDate) {
+    private static DateValue setUpStartDateAsDV(Task task, DateTime startDate) {
         if(task.hasDueTime()) {
-            return new DateTimeValueImpl(startDate.getYear() + 1900,
-                    startDate.getMonth() + 1, startDate.getDate(),
-                    startDate.getHours(), startDate.getMinutes(), startDate.getSeconds());
+            return new DateTimeValueImpl(startDate.getYear(),
+                    startDate.getMonthOfYear(), startDate.getDayOfMonth(),
+                    startDate.getHourOfDay(), startDate.getMinuteOfHour(), startDate.getSecondOfMinute());
         } else {
-            return new DateValueImpl(startDate.getYear() + 1900,
-                    startDate.getMonth() + 1, startDate.getDate());
+            return new DateValueImpl(startDate.getYear(), startDate.getMonthOfYear(), startDate.getDayOfMonth());
         }
     }
 
-    static long handleSubdayRepeat(Date startDate, RRule rrule) {
+    static long handleSubdayRepeat(DateTime startDate, RRule rrule) {
         long millis;
         switch(rrule.getFreq()) {
         case HOURLY:
@@ -301,8 +301,11 @@ public class RepeatTaskCompleteListener extends InjectingBroadcastReceiver {
         default:
             throw new RuntimeException("Error handing subday repeat: " + rrule.getFreq()); //$NON-NLS-1$
         }
-        long newDueDate = startDate.getTime() + millis * rrule.getInterval();
+        long newDueDate = startDate.getMillis() + millis * rrule.getInterval();
         return Task.createDueDate(Task.URGENCY_SPECIFIC_DAY_TIME, newDueDate);
     }
 
+    static long newDateUtc(int year, int month, int day, int hour, int minute, int second) {
+        return new LocalDateTime(year, month, day, hour, minute, second).toDateTime(DateTimeZone.UTC).getMillis();
+    }
 }

@@ -35,6 +35,7 @@ import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
 
 import static android.content.SharedPreferences.Editor;
 import static com.todoroo.andlib.utility.AndroidUtilities.atLeastJellybean;
+import static org.tasks.date.DateTimeUtils.newDateTime;
 
 public class Preferences {
 
@@ -343,7 +344,7 @@ public class Preferences {
     public String getNewAttachmentPath(String extension, AtomicReference<String> nameReference) {
         String dir = getAttachmentsDirectory().getAbsolutePath();
 
-        String name = getNonCollidingFileName(dir, new DateTime().toString("yyyyMMddHHmm"), extension);
+        String name = getNonCollidingFileName(dir, newDateTime().toString("yyyyMMddHHmm"), extension);
 
         if (nameReference != null) {
             nameReference.set(name);

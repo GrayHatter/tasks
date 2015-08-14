@@ -23,6 +23,7 @@ import org.tasks.ui.TimePreference;
 import javax.inject.Inject;
 
 import static com.todoroo.andlib.utility.AndroidUtilities.preJellybean;
+import static org.tasks.date.DateTimeUtils.newDateTime;
 
 public class ReminderPreferences extends InjectingPreferenceActivity {
 
@@ -73,7 +74,7 @@ public class ReminderPreferences extends InjectingPreferenceActivity {
         preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference ignored) {
-                final DateTime current = new DateTime().withMillisOfDay(preference.getMillisOfDay());
+                final DateTime current = newDateTime().withMillisOfDay(preference.getMillisOfDay());
                 startActivityForResult(new Intent(ReminderPreferences.this, TimePickerActivity.class) {{
                     putExtra(TimePickerActivity.EXTRA_TIMESTAMP, current.getMillis());
                 }}, requestCode);

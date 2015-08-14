@@ -31,7 +31,7 @@ import org.tasks.scheduling.AlarmManager;
 
 import javax.inject.Inject;
 
-import static org.tasks.date.DateTimeUtils.newDate;
+import static org.tasks.date.DateTimeUtils.newDateTime;
 
 public class CalendarReminderActivity extends InjectingAppCompatActivity {
 
@@ -195,7 +195,7 @@ public class CalendarReminderActivity extends InjectingAppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         createNewList(tag.getName() + " "
-                                + DateUtilities.getDateStringHideYear(newDate(startTime)));
+                                + DateUtilities.getDateStringHideYear(newDateTime(startTime)));
                     }
                 })
                 .setNegativeButton(R.string.CRA_use_existing, new DialogInterface.OnClickListener() {

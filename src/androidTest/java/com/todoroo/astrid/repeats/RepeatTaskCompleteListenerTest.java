@@ -8,6 +8,7 @@ import com.google.ical.values.RRule;
 import com.todoroo.astrid.data.Task;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.text.ParseException;
 
@@ -18,6 +19,7 @@ import static com.google.ical.values.Frequency.WEEKLY;
 import static com.google.ical.values.Frequency.YEARLY;
 import static com.todoroo.andlib.utility.DateUtilities.addCalendarMonthsToUnixtime;
 import static com.todoroo.astrid.repeats.RepeatTaskCompleteListener.computeNextDueDate;
+import static com.todoroo.astrid.repeats.RepeatTaskCompleteListener.newDateUtc;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -92,5 +94,11 @@ public class RepeatTaskCompleteListenerTest extends AndroidTestCase {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void testCreateNewUtcDate() {
+        DateTime utc = new DateTime(2014, 1, 1, 15, 17, 53, 0).toDateTime(DateTimeZone.UTC);
+        long actual = newDateUtc(utc.getYear(), utc.getMonthOfYear(), utc.getDayOfMonth(), utc.getHourOfDay(), utc.getMinuteOfHour(), utc.getSecondOfMinute());
+        assertEquals(utc.getMillis(), actual);
     }
 }

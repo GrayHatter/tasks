@@ -49,7 +49,7 @@ public class GtasksApiUtilitiesTest extends AndroidTestCase {
                 unixTimeToGtasksDueDate(now.getMillis()).getValue());
     }
 
-    public void disabled_testConvertGoogleDueDateToUnixTime() {
+    public void testConvertGoogleDueDateToUnixTime() {
         com.google.api.client.util.DateTime googleDueDate =
                 new com.google.api.client.util.DateTime(
                         new DateTime(2014, 1, 8, 0, 0, 0, 0).toDate(), TimeZone.getTimeZone("UTC"));

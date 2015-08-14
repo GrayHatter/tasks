@@ -18,6 +18,8 @@ import org.tasks.notifications.NotificationManager;
 
 import javax.inject.Inject;
 
+import static org.tasks.date.DateTimeUtils.newDateTime;
+
 public class SnoozeActivity extends InjectingAppCompatActivity implements SnoozeCallback, DialogInterface.OnCancelListener {
 
     private static final String FRAG_TAG_SNOOZE_DIALOG = "frag_tag_snooze_dialog";
@@ -91,7 +93,7 @@ public class SnoozeActivity extends InjectingAppCompatActivity implements Snooze
         pickingDateTime = true;
 
         startActivityForResult(new Intent(this, DateAndTimePickerActivity.class) {{
-            putExtra(DateAndTimePickerActivity.EXTRA_TIMESTAMP, new DateTime().plusMinutes(30).getMillis());
+            putExtra(DateAndTimePickerActivity.EXTRA_TIMESTAMP, newDateTime().plusMinutes(30).getMillis());
         }}, REQUEST_DATE_TIME);
     }
 

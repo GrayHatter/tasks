@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 import static com.todoroo.andlib.utility.AndroidUtilities.atLeastHoneycomb;
 import static java.util.Arrays.asList;
-import static org.tasks.date.DateTimeUtils.newDate;
 import static org.tasks.date.DateTimeUtils.newDateTime;
 import static org.tasks.preferences.ResourceResolver.getResource;
 
@@ -124,7 +123,7 @@ public class DeadlineControlSet extends TaskEditControlSetBase {
             } else if (date == today.plusWeeks(1).getMillis()) {
                 dueDateOptions.set(0, nextWeekString);
             } else {
-                dueDateOptions.set(0, DateUtilities.getLongDateStringHideYear(newDate(date)));
+                dueDateOptions.set(0, DateUtilities.getLongDateStringHideYear(newDateTime(date)));
             }
         }
         dueDateOptions.set(3, nextWeekString);
@@ -314,7 +313,7 @@ public class DeadlineControlSet extends TaskEditControlSetBase {
                         dialog.initialize(new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
-                                setDate(new DateTime(year, month + 1, day, 0, 0, 0, 0).getMillis());
+                                setDate(newDateTime(year, month + 1, day, 0, 0).getMillis());
                             }
                         }, today.getYear(), today.getMonthOfYear() - 1, today.getDayOfMonth(), false);
                         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {

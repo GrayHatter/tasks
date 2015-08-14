@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 import org.tasks.dialogs.MyDatePickerDialog;
 
 import static org.tasks.date.DateTimeUtils.currentTimeMillis;
+import static org.tasks.date.DateTimeUtils.newDateTime;
 
 public class DateAndTimePickerActivity extends FragmentActivity implements DatePickerDialog.OnDateSetListener, DialogInterface.OnCancelListener {
 
@@ -27,7 +28,7 @@ public class DateAndTimePickerActivity extends FragmentActivity implements DateP
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        initial = new DateTime(getIntent().getLongExtra(EXTRA_TIMESTAMP, currentTimeMillis()));
+        initial = newDateTime(getIntent().getLongExtra(EXTRA_TIMESTAMP, currentTimeMillis()));
 
         if (savedInstanceState != null) {
             dateSelected = savedInstanceState.getBoolean(EXTRA_DATE_SELECTED, false);

@@ -14,6 +14,7 @@ import org.joda.time.DateTime;
 import org.tasks.dialogs.MyTimePickerDialog;
 
 import static org.tasks.date.DateTimeUtils.currentTimeMillis;
+import static org.tasks.date.DateTimeUtils.newDateTime;
 
 
 public class TimePickerActivity extends FragmentActivity implements TimePickerDialog.OnTimeSetListener, DialogInterface.OnDismissListener {
@@ -29,7 +30,7 @@ public class TimePickerActivity extends FragmentActivity implements TimePickerDi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        initial = new DateTime(getIntent().getLongExtra(EXTRA_TIMESTAMP, currentTimeMillis()));
+        initial = newDateTime(getIntent().getLongExtra(EXTRA_TIMESTAMP, currentTimeMillis()));
 
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         MyTimePickerDialog dialog = (MyTimePickerDialog) supportFragmentManager.findFragmentByTag(FRAG_TAG_TIME_PICKER);

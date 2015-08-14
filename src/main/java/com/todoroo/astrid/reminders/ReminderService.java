@@ -276,17 +276,17 @@ public final class ReminderService  {
                 dueDateAlarm = dueDate;
             } else if (DateUtilities.now() > lastReminder + DateUtilities.ONE_DAY) {
                 // return notification time on this day
-                DateTime date = new DateTime(dueDate).withMillisOfDay(preferences.getInt(R.string.p_rmd_time, 18 * MILLIS_PER_HOUR));
+                DateTime date = newDateTime(dueDate).withMillisOfDay(preferences.getInt(R.string.p_rmd_time, 18 * MILLIS_PER_HOUR));
                 dueDateAlarm = date.getMillis();
                 if (dueDate > getNowValue() && dueDateAlarm < getNowValue()) {
                     // this only happens for tasks due today, cause dueDateAlarm wouldn't be in the past otherwise
                     // if the default reminder is in the past, then reschedule it
                     // on this day before start of quiet hours or after quiet hours
                     // randomly placed in this interval
-                    long quietHoursStart = new DateTime().withMillisOfDay(preferences.getInt(R.string.p_rmd_quietStart, 22 * MILLIS_PER_HOUR)).getMillis();
+                    long quietHoursStart = newDateTime().withMillisOfDay(preferences.getInt(R.string.p_rmd_quietStart, 22 * MILLIS_PER_HOUR)).getMillis();
                     DateTime quietHoursStartDate = newDateTime(quietHoursStart);
 
-                    long quietHoursEnd = new DateTime().withMillisOfDay(preferences.getInt(R.string.p_rmd_quietEnd, 10 * MILLIS_PER_HOUR)).getMillis();
+                    long quietHoursEnd = newDateTime().withMillisOfDay(preferences.getInt(R.string.p_rmd_quietEnd, 10 * MILLIS_PER_HOUR)).getMillis();
                     DateTime quietHoursEndDate = newDateTime(quietHoursEnd);
 
                     boolean quietHoursEnabled = preferences.quietHoursEnabled();

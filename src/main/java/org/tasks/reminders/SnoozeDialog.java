@@ -21,6 +21,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import static com.todoroo.andlib.utility.DateUtilities.getTimeString;
+import static org.tasks.date.DateTimeUtils.newDateTime;
 
 public class SnoozeDialog extends InjectingDialogFragment {
 
@@ -28,7 +29,7 @@ public class SnoozeDialog extends InjectingDialogFragment {
     @Inject @ForApplication Context context;
     @Inject DialogBuilder dialogBuilder;
 
-    private DateTime now = new DateTime();
+    private DateTime now = newDateTime();
     private SnoozeCallback snoozeCallback;
     private DialogInterface.OnCancelListener onCancelListener;
     private List<Long> snoozeTimes = new ArrayList<>();
@@ -52,7 +53,7 @@ public class SnoozeDialog extends InjectingDialogFragment {
         items.add(getString(R.string.date_shortcut_hour));
         snoozeTimes.add(0L);
         
-        DateTime hourCutoff = new DateTime().plusMinutes(75);
+        DateTime hourCutoff = newDateTime().plusMinutes(75);
 
         if (morning.isAfter(hourCutoff)) {
             add(R.string.date_shortcut_morning, morning);
@@ -79,7 +80,7 @@ public class SnoozeDialog extends InjectingDialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
-                                snoozeCallback.snoozeForTime(new DateTime().plusHours(1).getMillis());
+                                snoozeCallback.snoozeForTime(newDateTime().plusHours(1).getMillis());
                                 break;
                             case 1:
                             case 2:

@@ -7,13 +7,12 @@ package com.todoroo.astrid.gtasks.api;
 
 import com.google.api.client.util.DateTime;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.TimeZone;
-
-import static org.tasks.date.DateTimeUtils.newDate;
 
 public class GtasksApiUtilities {
 
@@ -23,7 +22,7 @@ public class GtasksApiUtilities {
         if (time < 0) {
             return null;
         }
-        return new DateTime(newDate(time), TimeZone.getDefault());
+        return new DateTime(time);
     }
 
     public static long gtasksCompletedTimeToUnixTime(DateTime gtasksCompletedTime) {
@@ -43,12 +42,8 @@ public class GtasksApiUtilities {
         if (time < 0) {
             return null;
         }
-        Date date = newDate(time / 1000 * 1000);
-        date.setHours(0);
-        date.setMinutes(0);
-        date.setSeconds(0);
-        date.setTime(date.getTime() - date.getTimezoneOffset() * 60000);
-        return new DateTime(date, TimeZone.getTimeZone("UTC"));
+        org.joda.time.DateTime dateTime = new LocalDateTime(time).withMillisOfDay(0).toDateTime(DateTimeZone.UTC);
+        return new DateTime(dateTime.toDate(), TimeZone.getTimeZone("UTC"));
     }
 
     //Adjust for google's rounding
@@ -57,10 +52,8 @@ public class GtasksApiUtilities {
             return 0;
         }
         try {
-            long utcTime = gtasksDueTime.getValue(); //DateTime.parseRfc3339(gtasksDueTime).value;
-            Date date = newDate(utcTime);
-            Date returnDate = newDate(date.getTime() + date.getTimezoneOffset() * 60000);
-            return returnDate.getTime();
+            org.joda.time.DateTime dateTime = new org.joda.time.DateTime(gtasksDueTime.getValue(), DateTimeZone.UTC);
+            return dateTime.toLocalDateTime().toDateTime().getMillis();
         } catch (NumberFormatException e) {
             log.error(e.getMessage(), e);
             return 0;

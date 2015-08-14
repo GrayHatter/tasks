@@ -45,6 +45,7 @@ import javax.inject.Inject;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.tasks.date.DateTimeUtils.currentTimeMillis;
+import static org.tasks.date.DateTimeUtils.newDateTime;
 
 public class Notifier {
 
@@ -380,8 +381,8 @@ public class Notifier {
     static boolean isQuietHours(Preferences preferences) {
         boolean quietHoursEnabled = preferences.quietHoursEnabled();
         if (quietHoursEnabled) {
-            long quietHoursStart = new DateTime().withMillisOfDay(preferences.getInt(R.string.p_rmd_quietStart)).getMillis();
-            long quietHoursEnd = new DateTime().withMillisOfDay(preferences.getInt(R.string.p_rmd_quietEnd)).getMillis();
+            long quietHoursStart = newDateTime().withMillisOfDay(preferences.getInt(R.string.p_rmd_quietStart)).getMillis();
+            long quietHoursEnd = newDateTime().withMillisOfDay(preferences.getInt(R.string.p_rmd_quietEnd)).getMillis();
             long now = currentTimeMillis();
             if (quietHoursStart <= quietHoursEnd) {
                 if (now >= quietHoursStart && now < quietHoursEnd) {

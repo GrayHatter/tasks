@@ -44,11 +44,9 @@ import org.tasks.preferences.ActivityPreferences;
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.tasks.date.DateTimeUtils.newDate;
 import static org.tasks.date.DateTimeUtils.newDateTime;
 
 /**
@@ -136,7 +134,7 @@ public class RepeatControlSet extends PopupControlSet {
         dialog.initialize(new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
-                setRepeatUntilValue(new DateTime(year, month + 1, day, 0, 0, 0, 0).getMillis());
+                setRepeatUntilValue(newDateTime(year, month + 1, day, 0, 0).getMillis());
             }
         }, initial.getYear(), initial.getMonthOfYear() - 1, initial.getDayOfMonth(), false);
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -206,11 +204,11 @@ public class RepeatControlSet extends PopupControlSet {
 
     @Override
     protected void readFromTaskOnInitialize() {
-        Date date;
+        DateTime date;
         if(model.getDueDate() != 0) {
-            date = newDate(model.getDueDate());
+            date = newDateTime(model.getDueDate());
 
-            int dayOfWeek = date.getDay();
+            int dayOfWeek = date.getDayOfWeek() % 7;
             for(int i = 0; i < 7; i++) {
                 daysOfWeek[i].setChecked(i == dayOfWeek);
             }
@@ -475,9 +473,8 @@ public class RepeatControlSet extends PopupControlSet {
 
     private String getDisplayString() {
         StringBuilder displayString = new StringBuilder();
-        Date d = newDate(repeatUntilValue);
-        if (d.getTime() > 0) {
-            displayString.append(DateUtilities.getDateStringHideYear(d));
+        if (repeatUntilValue > 0) {
+            displayString.append(DateUtilities.getDateStringHideYear(newDateTime(repeatUntilValue)));
             if (Task.hasDueTime(repeatUntilValue)) {
                 displayString.append(", "); //$NON-NLS-1$ //$NON-NLS-2$
                 displayString.append(DateUtilities.getTimeString(activity, repeatUntilValue));

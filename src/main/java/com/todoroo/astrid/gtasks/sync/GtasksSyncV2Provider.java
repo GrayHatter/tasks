@@ -34,6 +34,7 @@ import com.todoroo.astrid.gtasks.auth.GtasksTokenValidator;
 import com.todoroo.astrid.service.TaskService;
 import com.todoroo.astrid.sync.SyncResultCallback;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tasks.R;
@@ -42,14 +43,13 @@ import org.tasks.preferences.Preferences;
 import org.tasks.sync.SyncExecutor;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import static org.tasks.date.DateTimeUtils.newDate;
+import static org.tasks.date.DateTimeUtils.newDateTime;
 
 @Singleton
 public class GtasksSyncV2Provider {
@@ -297,13 +297,13 @@ public class GtasksSyncV2Provider {
 
     private void mergeDates(Task remote, Task local) {
         if(remote.hasDueDate() && local.hasDueTime()) {
-            Date newDate = newDate(remote.getDueDate());
-            Date oldDate = newDate(local.getDueDate());
-            newDate.setHours(oldDate.getHours());
-            newDate.setMinutes(oldDate.getMinutes());
-            newDate.setSeconds(oldDate.getSeconds());
+            DateTime oldDate = newDateTime(local.getDueDate());
+            DateTime newDate = newDateTime(remote.getDueDate())
+                    .withHourOfDay(oldDate.getHourOfDay())
+                    .withMinuteOfHour(oldDate.getMinuteOfHour())
+                    .withSecondOfMinute(oldDate.getSecondOfMinute());
             long setDate = Task.createDueDate(Task.URGENCY_SPECIFIC_DAY_TIME,
-                    newDate.getTime());
+                    newDate.getMillis());
             remote.setDueDate(setDate);
         }
     }

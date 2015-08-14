@@ -12,6 +12,8 @@ import org.tasks.activities.TimePickerActivity;
 
 import java.text.DateFormat;
 
+import static org.tasks.date.DateTimeUtils.newDateTime;
+
 public class TimePreference extends Preference {
 
     private int millisOfDay;
@@ -33,7 +35,7 @@ public class TimePreference extends Preference {
     @Override
     public void onSetInitialValue(boolean restoreValue, Object defaultValue) {
         if (restoreValue) {
-            int noon = new DateTime().withMillisOfDay(0).withHourOfDay(12).getMillisOfDay();
+            int noon = newDateTime().withMillisOfDay(0).withHourOfDay(12).getMillisOfDay();
             millisOfDay = getPersistedInt(noon);
         } else {
             millisOfDay = Integer.parseInt((String) defaultValue);
@@ -48,7 +50,7 @@ public class TimePreference extends Preference {
 
     public void handleTimePickerActivityIntent(Intent data) {
         long timestamp = data.getLongExtra(TimePickerActivity.EXTRA_TIMESTAMP, 0L);
-        int millisOfDay = new DateTime(timestamp).getMillisOfDay();
+        int millisOfDay = newDateTime(timestamp).getMillisOfDay();
         if (callChangeListener(millisOfDay)) {
             persistInt(millisOfDay);
             setMillisOfDay(millisOfDay);
@@ -57,7 +59,7 @@ public class TimePreference extends Preference {
 
     private void setMillisOfDay(int millisOfDay) {
         this.millisOfDay = millisOfDay;
-        String setting = DateFormat.getTimeInstance(DateFormat.SHORT).format(new DateTime().withMillisOfDay(millisOfDay).toDate());
+        String setting = DateFormat.getTimeInstance(DateFormat.SHORT).format(newDateTime().withMillisOfDay(millisOfDay).toDate());
         setSummary(summary == null ? setting : String.format(summary, setting));
     }
 }

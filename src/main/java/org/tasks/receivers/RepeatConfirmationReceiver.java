@@ -21,8 +21,6 @@ import org.tasks.injection.InjectingBroadcastReceiver;
 
 import javax.inject.Inject;
 
-import static org.tasks.date.DateTimeUtils.newDate;
-
 public class RepeatConfirmationReceiver extends InjectingBroadcastReceiver {
 
     private static final Logger log = LoggerFactory.getLogger(RepeatConfirmationReceiver.class);

@@ -12,7 +12,6 @@ import android.util.DisplayMetrics;
 import org.joda.time.DateTime;
 import org.tasks.Snippet;
 
-import java.util.Date;
 import java.util.Locale;
 
 import static com.todoroo.andlib.utility.DateUtilities.addCalendarMonthsToUnixtime;
@@ -25,7 +24,8 @@ import static com.todoroo.andlib.utility.DateUtilities.getWeekdayShort;
 import static com.todoroo.andlib.utility.DateUtilities.isEndOfMonth;
 import static com.todoroo.andlib.utility.DateUtilities.oneMonthFromNow;
 import static org.tasks.Freeze.freezeAt;
-import static org.tasks.date.DateTimeUtils.newDate;
+import static org.tasks.TestUtilities.newDate;
+import static org.tasks.date.DateTimeUtils.newDateTime;
 
 public class DateUtilitiesTest extends AndroidTestCase {
 
@@ -63,17 +63,17 @@ public class DateUtilitiesTest extends AndroidTestCase {
     public void testTimeString() {
         forEachLocale(new Runnable() {
             public void run() {
-                Date d = newDate();
+                DateTime d = newDateTime();
 
                 DateUtilities.is24HourOverride = false;
                 for (int i = 0; i < 24; i++) {
-                    d.setHours(i);
+                    d = d.withHourOfDay(i);
                     getTimeString(getContext(), new DateTime(d));
                 }
 
                 DateUtilities.is24HourOverride = true;
                 for (int i = 0; i < 24; i++) {
-                    d.setHours(i);
+                    d = d.withHourOfDay(i);
                     getTimeString(getContext(), new DateTime(d));
                 }
             }
@@ -83,10 +83,10 @@ public class DateUtilitiesTest extends AndroidTestCase {
     public void testDateString() {
         forEachLocale(new Runnable() {
             public void run() {
-                Date d = newDate();
+                DateTime d = newDateTime();
 
                 for (int i = 0; i < 12; i++) {
-                    d.setMonth(i);
+                    d = d.withMonthOfYear(i + 1);
                     getDateString(d);
                 }
             }
@@ -111,12 +111,12 @@ public class DateUtilitiesTest extends AndroidTestCase {
     }
 
     public void testGetDateStringWithYear() {
-        assertEquals("Jan 4, 2014", getDateString(new DateTime(2014, 1, 4, 0, 0, 0).toDate()));
+        assertEquals("Jan 4, 2014", getDateString(new DateTime(2014, 1, 4, 0, 0, 0)));
     }
 
     public void testGetDateStringHidingYear() {
         freezeAt(newDate(2014, 1, 1)).thawAfter(new Snippet() {{
-            assertEquals("Jan 1", getDateStringHideYear(newDate()));
+            assertEquals("Jan 1", getDateStringHideYear(newDateTime()));
         }});
     }
 
@@ -228,15 +228,15 @@ public class DateUtilitiesTest extends AndroidTestCase {
     }
 
     public void testAddMonthsToTimestamp() {
-        assertEquals(newDate(2014, 1, 1).getTime(), addCalendarMonthsToUnixtime(newDate(2013, 12, 1).getTime(), 1));
-        assertEquals(newDate(2014, 12, 31).getTime(), addCalendarMonthsToUnixtime(newDate(2013, 12, 31).getTime(), 12));
+        assertEquals(newDate(2014, 1, 1).getMillis(), addCalendarMonthsToUnixtime(newDate(2013, 12, 1).getMillis(), 1));
+        assertEquals(newDate(2014, 12, 31).getMillis(), addCalendarMonthsToUnixtime(newDate(2013, 12, 31).getMillis(), 12));
     }
 
     public void testAddMonthsWithLessDays() {
-        assertEquals(newDate(2014, 3, 3).getTime(), addCalendarMonthsToUnixtime(newDate(2013, 12, 31).getTime(), 2));
+        assertEquals(newDate(2014, 3, 3).getMillis(), addCalendarMonthsToUnixtime(newDate(2013, 12, 31).getMillis(), 2));
     }
 
     public void testAddMonthsWithMoreDays() {
-        assertEquals(newDate(2014, 1, 30).getTime(), addCalendarMonthsToUnixtime(newDate(2013, 11, 30).getTime(), 2));
+        assertEquals(newDate(2014, 1, 30).getMillis(), addCalendarMonthsToUnixtime(newDate(2013, 11, 30).getMillis(), 2));
     }
 }
